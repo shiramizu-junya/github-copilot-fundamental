@@ -1,0 +1,31 @@
+### Create User (POST)
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "name": "山田太郎",
+  "email": "yamada@example.com"
+}
+
+###
+
+### Get User by ID (GET)
+GET http://localhost:3000/users/1
+
+###
+
+### Update User (PUT)
+PUT http://localhost:3000/users/1
+Content-Type: application/json
+
+{
+  "name": "山田次郎",
+  "email": "yamada.jiro@example.com"
+}
+
+###
+
+### Delete User (DELETE)
+DELETE http://localhost:3000/users/1
+
+###
