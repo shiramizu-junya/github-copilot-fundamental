@@ -1,0 +1,268 @@
+/* リセットと基本スタイル */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+		sans-serif;
+	background-color: #f5f5f5;
+	color: #333;
+	line-height: 1.6;
+}
+
+.container {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+/* ヘッダー */
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30px;
+	padding-bottom: 20px;
+	border-bottom: 2px solid #e0e0e0;
+}
+
+header h1 {
+	font-size: 1.8rem;
+	color: #2c3e50;
+}
+
+/* ボタンスタイル */
+.btn {
+	display: inline-block;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	font-size: 1rem;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn:hover {
+	transform: translateY(-1px);
+}
+
+.btn-primary {
+	background-color: #3498db;
+	color: white;
+}
+
+.btn-primary:hover {
+	background-color: #2980b9;
+}
+
+.btn-secondary {
+	background-color: #95a5a6;
+	color: white;
+}
+
+.btn-secondary:hover {
+	background-color: #7f8c8d;
+}
+
+.btn-small {
+	padding: 5px 12px;
+	font-size: 0.85rem;
+}
+
+.btn-edit {
+	background-color: #f39c12;
+	color: white;
+}
+
+.btn-edit:hover {
+	background-color: #e67e22;
+}
+
+.btn-delete {
+	background-color: #e74c3c;
+	color: white;
+}
+
+.btn-delete:hover {
+	background-color: #c0392b;
+}
+
+/* テーブルスタイル */
+.todo-table {
+	width: 100%;
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	border-collapse: collapse;
+	overflow: hidden;
+}
+
+.todo-table thead {
+	background-color: #34495e;
+	color: white;
+}
+
+.todo-table th,
+.todo-table td {
+	padding: 15px;
+	text-align: left;
+}
+
+.todo-table th {
+	font-weight: 600;
+}
+
+.todo-table tbody tr {
+	border-bottom: 1px solid #ecf0f1;
+	transition: background-color 0.2s;
+}
+
+.todo-table tbody tr:hover {
+	background-color: #f8f9fa;
+}
+
+.todo-table tbody tr:last-child {
+	border-bottom: none;
+}
+
+.todo-table .title {
+	font-weight: 500;
+	max-width: 200px;
+}
+
+.todo-table .content {
+	color: #666;
+	max-width: 250px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.todo-table .actions {
+	display: flex;
+	gap: 8px;
+}
+
+.delete-form {
+	display: inline;
+}
+
+/* 優先度バッジ */
+.priority-badge {
+	display: inline-block;
+	padding: 4px 12px;
+	border-radius: 20px;
+	font-size: 0.85rem;
+	font-weight: 500;
+}
+
+.priority-badge.priority-1 {
+	background-color: #fee2e2;
+	color: #dc2626;
+}
+
+.priority-badge.priority-2 {
+	background-color: #fef3c7;
+	color: #d97706;
+}
+
+.priority-badge.priority-3 {
+	background-color: #d1fae5;
+	color: #059669;
+}
+
+/* 空メッセージ */
+.empty-message {
+	text-align: center;
+	padding: 60px 20px;
+	background: white;
+	border-radius: 8px;
+	color: #666;
+	font-size: 1.1rem;
+}
+
+/* フォームスタイル */
+.todo-form {
+	background: white;
+	padding: 30px;
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	max-width: 600px;
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 8px;
+	font-weight: 500;
+	color: #2c3e50;
+}
+
+.form-group .required {
+	color: #e74c3c;
+}
+
+.form-group input[type='text'],
+.form-group input[type='date'],
+.form-group textarea,
+.form-group select {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+	font-size: 1rem;
+	transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+	outline: none;
+	border-color: #3498db;
+	box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group textarea {
+	resize: vertical;
+}
+
+.form-actions {
+	display: flex;
+	gap: 12px;
+	margin-top: 30px;
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+	.container {
+		padding: 15px;
+	}
+
+	header {
+		flex-direction: column;
+		gap: 15px;
+		text-align: center;
+	}
+
+	.todo-table {
+		display: block;
+		overflow-x: auto;
+	}
+
+	.todo-table th,
+	.todo-table td {
+		padding: 10px;
+		font-size: 0.9rem;
+	}
+
+	.todo-form {
+		padding: 20px;
+	}
+}

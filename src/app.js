@@ -1,23 +1,31 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const userRoutes = require('./routes/userRoutes');
-const errorHandler = require('./middleware/errorHandler');
+const path = require('path');
+const todoRoutes = require('./routes/todoRoutes');
+const db = require('../data/database');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-// ミドルウェアの設定
-app.use(bodyParser.json());
+// ミドルウェア設定
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// ルーティングの設定
-app.use('/', userRoutes);
+// ビューエンジン設定
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// エラーハンドリングミドルウェア
-app.use(errorHandler);
+// ルーティング
+app.use('/', todoRoutes);
 
-// サーバーの起動
-app.listen(PORT, () => {
-	console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-module.exports = app;
+// データベース初期化後にサーバー起動
+db.initDatabase()
+	.then(() => {
+		app.listen(PORT, () => {
+			console.log(`サーバーが起動しました: http://localhost:${PORT}`);
+		});
+	})
+	.catch((err) => {
+		console.error('データベース初期化エラー:', err);
+		process.exit(1);
+	});
