@@ -45,30 +45,18 @@ function saveDatabase() {
 }
 
 // 全件取得
-function getAll(sortBy = 'priority', sortOrder = 'asc') {
-	// 許可されたソートカラム
-	const allowedColumns = ['priority', 'due_date', 'title', 'created_at'];
-	const column = allowedColumns.includes(sortBy) ? sortBy : 'priority';
-	const order = sortOrder.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
-
-	// due_dateがnullの場合は最後に表示
-	let orderClause;
-	if (column === 'due_date') {
-		orderClause = `ORDER BY CASE WHEN due_date IS NULL OR due_date = '' THEN 1 ELSE 0 END, due_date ${order}`;
-	} else {
-		orderClause = `ORDER BY ${column} ${order}`;
-	}
-
-	const result = db.exec(`SELECT * FROM todos ${orderClause}`);
-	if (result.length === 0) return [];
-
-	const columns = result[0].columns;
-	return result[0].values.map((row) => {
-		const obj = {};
-		columns.forEach((col, i) => (obj[col] = row[i]));
-		return obj;
-	});
-}
+/**
+ * Retrieves all todos from the database with optional sorting.
+ *
+ * @param {string} [sortBy='priority'] - The column to sort by. Allowed values: 'priority', 'due_date', 'title', 'created_at'.
+ * @param {string} [sortOrder='asc'] - The sort order. Accepts 'asc' or 'desc' (case-insensitive).
+ * @returns {Array<Object>} An array of todo objects. Returns an empty array if no todos exist.
+ *
+ * @description
+ * - If an invalid sortBy value is provided, defaults to 'priority'.
+ * - If an invalid sortOrder is provided, defaults to 'ASC'.
+ * - When sorting by 'due_date', null or empty values are placed at the end regardless of sort order.
+ */
 
 // 1件取得
 function getById(id) {
