@@ -2,64 +2,36 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%- include('partials/head') %>
     <title>ToDo一覧</title>
-    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
+    <%- include('partials/navbar') %>
+
     <div class="container">
-        <header>
-            <h1>📝 ToDo管理</h1>
-            <a href="/todos/new" class="btn btn-primary">新規作成</a>
-        </header>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">ToDo一覧</h1>
+            <a href="/todos/new" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> 新規作成
+            </a>
+        </div>
 
         <main>
-            <% if (todos.length===0) { %>
-                <p class="empty-message">ToDoがありません。新規作成してください。</p>
-                <% } else { %>
-                    <table class="todo-table">
-                        <thead>
-                            <tr>
-                                <th>タイトル</th>
-                                <th>内容</th>
-                                <th>期限</th>
-                                <th>優先度</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% todos.forEach(todo=> { %>
-                                <tr class="priority-<%= todo.priority %>">
-                                    <td class="title">
-                                        <%= todo.title %>
-                                    </td>
-                                    <td class="content">
-                                        <%= todo.content || '-' %>
-                                    </td>
-                                    <td class="due-date">
-                                        <%= todo.due_date || '-' %>
-                                    </td>
-                                    <td class="priority">
-                                        <span class="priority-badge priority-<%= todo.priority %>">
-                                            <%= priorityLabels[todo.priority] %>
-                                        </span>
-                                    </td>
-                                    <td class="actions">
-                                        <a href="/todos/<%= todo.id %>/edit" class="btn btn-small btn-edit">編集</a>
-                                        <form action="/todos/<%= todo.id %>/delete" method="POST" class="delete-form"
-                                            onsubmit="return confirm('削除してもよろしいですか？');">
-                                            <button type="submit" class="btn btn-small btn-delete">削除</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <% }); %>
-                        </tbody>
-                    </table>
-                    <% } %>
+            <% if (todos.length === 0) { %>
+                <div class="alert alert-info text-center" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    ToDoがありません。新規作成してください。
+                </div>
+            <% } else { %>
+                <%- include('partials/sort-controls', { currentSort: currentSort, currentOrder: currentOrder }) %>
+                <%- include('partials/todo-table', { todos: todos }) %>
+                <%- include('partials/todo-cards', { todos: todos }) %>
+            <% } %>
         </main>
     </div>
+
+    <%- include('partials/footer') %>
 </body>
 
 </html>
