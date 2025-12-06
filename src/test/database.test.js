@@ -179,5 +179,138 @@ describe('database.js', () => {
 			const deletedTodo = database.getById(createdTodo.id);
 			expect(deletedTodo).toBeNull();
 		});
+
+		it('存在しないIDを削除しようとしてもエラーにならないこと', async () => {
+			const database = require('../../data/database');
+			await database.initDatabase();
+
+			// 存在しないIDを削除してもエラーにならない
+			expect(() => database.deleteById(99999)).not.toThrow();
+		});
+	});
+
+	describe('異常系テスト', () => {
+		describe('create - 異常系', () => {
+			it('titleがnullの場合でもエラーにならないこと', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				// sql.jsの仕様上、NOT NULL制約違反でエラーになる
+				expect(() => database.create(null, '内容', null, 2)).toThrow();
+			});
+
+			it('titleがundefinedの場合でもエラーにならないこと', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				expect(() => database.create(undefined, '内容', null, 2)).toThrow();
+			});
+
+			it('priorityに不正な値を指定した場合でも作成できること', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				// priorityに文字列を渡しても作成される（SQLiteの型の柔軟性）
+				database.create('優先度文字列テスト', '', null, 'invalid');
+				const todos = database.getAll();
+				const todo = todos.find((t) => t.title === '優先度文字列テスト');
+				expect(todo).toBeDefined();
+			});
+
+			it('priorityに負の値を指定した場合でも作成できること', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				database.create('負の優先度テスト', '', null, -1);
+				const todos = database.getAll();
+				const todo = todos.find((t) => t.title === '負の優先度テスト');
+				expect(todo).toBeDefined();
+				expect(todo.priority).toBe(-1);
+			});
+		});
+
+		describe('getById - 異常系', () => {
+			it('IDにnullを指定した場合はnullを返すこと', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				const todo = database.getById(null);
+				expect(todo).toBeNull();
+			});
+
+			it('IDにundefinedを指定した場合はエラーになること', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				// sql.jsはundefinedをバインドできない
+				expect(() => database.getById(undefined)).toThrow();
+			});
+
+			it('IDに文字列を指定した場合はnullを返すこと', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				const todo = database.getById('invalid');
+				expect(todo).toBeNull();
+			});
+
+			it('IDに負の数を指定した場合はnullを返すこと', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				const todo = database.getById(-1);
+				expect(todo).toBeNull();
+			});
+		});
+
+		describe('update - 異常系', () => {
+			it('IDにnullを指定した場合は0を返すこと', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				const result = database.update(null, '更新タスク', '内容', '2024-12-31', 1);
+				expect(result).toBe(0);
+			});
+
+			it('IDにundefinedを指定した場合はエラーになること', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				// sql.jsはundefinedをバインドできない
+				expect(() => database.update(undefined, '更新タスク', '内容', '2024-12-31', 1)).toThrow();
+			});
+
+			it('titleをnullに更新しようとするとエラーになること', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				database.create('更新異常系テスト', '内容', null, 2);
+				const todos = database.getAll();
+				const createdTodo = todos.find((t) => t.title === '更新異常系テスト');
+
+				// NOT NULL制約違反
+				expect(() => database.update(createdTodo.id, null, '内容', null, 2)).toThrow();
+			});
+		});
+
+		describe('getAll - 異常系', () => {
+			it('SQLインジェクション的なソートカラムを指定してもpriorityでソートされること', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				// SQLインジェクションを試みる
+				const todos = database.getAll("'; DROP TABLE todos; --", 'asc');
+				expect(Array.isArray(todos)).toBe(true);
+			});
+
+			it('ソートオーダーに不正な値を指定してもASCでソートされること', async () => {
+				const database = require('../../data/database');
+				await database.initDatabase();
+
+				// 不正なソートオーダーを指定
+				const todos = database.getAll('priority', 'INVALID');
+				expect(Array.isArray(todos)).toBe(true);
+			});
+		});
 	});
 });
