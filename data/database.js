@@ -82,9 +82,9 @@ function getAll(sortBy = 'priority', sortOrder = 'asc') {
 
 	const stmt = db.prepare(query);
 	const results = [];
+	const columns = stmt.getColumnNames();
 
 	while (stmt.step()) {
-		const columns = stmt.getColumnNames();
 		const values = stmt.get();
 		const obj = {};
 		columns.forEach((col, i) => (obj[col] = values[i]));
