@@ -40,7 +40,11 @@ function saveDatabase() {
 	if (db) {
 		const data = db.export();
 		const buffer = Buffer.from(data);
-		fs.writeFileSync(dbPath, buffer);
+		fs.writeFile(dbPath, buffer, (err) => {
+			if (err) {
+				console.error('Failed to save database:', err);
+			}
+		});
 	}
 }
 
@@ -52,7 +56,18 @@ function getAll(sortBy = 'priority', sortOrder = 'asc') {
 	const order = sortOrder.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
 
 	// due_dateがnullの場合は最後に表示
-	let orderClause;
+	// Use a lookup table to avoid direct interpolation
+	const columnMap = {
+		priority: 'priority',
+		due_date: 'due_date',
+		title: 'title',
+		created_at: 'created_at',
+	};
+	const orderMap = {
+		ASC: 'ASC',
+		DESC: 'DESC',
+	};
+	orderClause = `ORDER BY ${columnMap[column]} ${orderMap[order]}`;
 	if (column === 'due_date') {
 		orderClause = `ORDER BY CASE WHEN due_date IS NULL OR due_date = '' THEN 1 ELSE 0 END, due_date ${order}`;
 	} else {
@@ -63,11 +78,10 @@ function getAll(sortBy = 'priority', sortOrder = 'asc') {
 	if (result.length === 0) return [];
 
 	const columns = result[0].columns;
-	return result[0].values.map((row) => {
-		const obj = {};
-		columns.forEach((col, i) => (obj[col] = row[i]));
-		return obj;
-	});
+	const todo = {};
+	columns.forEach((col, i) => (todo[col] = values[i]));
+	stmt.free();
+	return todo;
 }
 
 // 1件取得
@@ -100,10 +114,14 @@ function create(title, content, due_date, priority) {
 
 // 更新
 function update(id, title, content, due_date, priority) {
-	// 更新前にレコードの存在を確認
-	const existing = getById(id);
-	if (!existing) {
-		return 0;
+	function deleteById(id) {
+		const existing = getById(id);
+		if (!existing) {
+			return 0;
+		}
+		db.run('DELETE FROM todos WHERE id = ?', [id]);
+		saveDatabase();
+		return 1;
 	}
 
 	db.run(
