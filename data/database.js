@@ -57,6 +57,43 @@ function saveDatabase() {
  * - If an invalid sortOrder is provided, defaults to 'ASC'.
  * - When sorting by 'due_date', null or empty values are placed at the end regardless of sort order.
  */
+function getAll(sortBy = 'priority', sortOrder = 'asc') {
+	// Validate sortBy column (whitelist approach to prevent SQL injection)
+	const allowedColumns = ['priority', 'due_date', 'title', 'created_at'];
+	const validSortBy = allowedColumns.includes(sortBy) ? sortBy : 'priority';
+
+	// Validate sortOrder (case-insensitive)
+	const normalizedOrder = sortOrder.toLowerCase();
+	const validSortOrder = normalizedOrder === 'desc' ? 'DESC' : 'ASC';
+
+	// Build the SQL query with special handling for due_date sorting
+	let query;
+	if (validSortBy === 'due_date') {
+		// For due_date, put null/empty values at the end regardless of sort order
+		query = `
+			SELECT * FROM todos
+			ORDER BY 
+				CASE WHEN due_date IS NULL OR due_date = '' THEN 1 ELSE 0 END,
+				due_date ${validSortOrder}
+		`;
+	} else {
+		query = `SELECT * FROM todos ORDER BY ${validSortBy} ${validSortOrder}`;
+	}
+
+	const stmt = db.prepare(query);
+	const results = [];
+
+	while (stmt.step()) {
+		const columns = stmt.getColumnNames();
+		const values = stmt.get();
+		const obj = {};
+		columns.forEach((col, i) => (obj[col] = values[i]));
+		results.push(obj);
+	}
+
+	stmt.free();
+	return results;
+}
 
 // 1件取得
 function getById(id) {
