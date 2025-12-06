@@ -45,8 +45,21 @@ function saveDatabase() {
 }
 
 // 全件取得
-function getAll() {
-	const result = db.exec('SELECT * FROM todos ORDER BY priority ASC, due_date ASC');
+function getAll(sortBy = 'priority', sortOrder = 'asc') {
+	// 許可されたソートカラム
+	const allowedColumns = ['priority', 'due_date', 'title', 'created_at'];
+	const column = allowedColumns.includes(sortBy) ? sortBy : 'priority';
+	const order = sortOrder.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
+
+	// due_dateがnullの場合は最後に表示
+	let orderClause;
+	if (column === 'due_date') {
+		orderClause = `ORDER BY CASE WHEN due_date IS NULL OR due_date = '' THEN 1 ELSE 0 END, due_date ${order}`;
+	} else {
+		orderClause = `ORDER BY ${column} ${order}`;
+	}
+
+	const result = db.exec(`SELECT * FROM todos ${orderClause}`);
 	if (result.length === 0) return [];
 
 	const columns = result[0].columns;
@@ -87,19 +100,24 @@ function create(title, content, due_date, priority) {
 
 // 更新
 function update(id, title, content, due_date, priority) {
+	// 更新前にレコードの存在を確認
+	const existing = getById(id);
+	if (!existing) {
+		return 0;
+	}
+
 	db.run(
 		'UPDATE todos SET title = ?, content = ?, due_date = ?, priority = ?, updated_at = datetime("now") WHERE id = ?',
 		[title, content || '', due_date || null, priority || 2, id]
 	);
 	saveDatabase();
-	return db.getRowsModified();
+	return 1;
 }
 
 // 削除
 function deleteById(id) {
 	db.run('DELETE FROM todos WHERE id = ?', [id]);
 	saveDatabase();
-	return db.getRowsModified();
 }
 
 module.exports = {

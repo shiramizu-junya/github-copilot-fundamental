@@ -11,10 +11,14 @@ class TodoController {
 	// ToDo一覧表示
 	index(req, res) {
 		try {
-			const todos = db.getAll();
+			const sortBy = req.query.sort || 'priority';
+			const sortOrder = req.query.order || 'asc';
+			const todos = db.getAll(sortBy, sortOrder);
 			res.render('index', {
 				todos,
 				priorityLabels: TodoController.PRIORITY_LABELS,
+				currentSort: sortBy,
+				currentOrder: sortOrder,
 			});
 		} catch (error) {
 			console.error('一覧取得エラー:', error);
@@ -94,12 +98,13 @@ class TodoController {
 	delete(req, res) {
 		try {
 			const { id } = req.params;
-			const changes = db.deleteById(parseInt(id));
+			const todo = db.getById(parseInt(id));
 
-			if (changes === 0) {
-				return res.status(404).send('ToDoが見つかりません');
+			if (!todo) {
+				return res.redirect('/');
 			}
 
+			db.deleteById(parseInt(id));
 			res.redirect('/');
 		} catch (error) {
 			console.error('削除エラー:', error);
