@@ -19,7 +19,7 @@ router.get('/register', redirectIfAuthenticated, (req, res) => {
 });
 
 // ユーザー登録処理
-router.post('/register', authLimiter, (req, res) => {
+router.post('/register', redirectIfAuthenticated, authLimiter, (req, res) => {
   const { username, email, password, confirmPassword } = req.body;
 
   // バリデーション
@@ -51,7 +51,7 @@ router.get('/login', redirectIfAuthenticated, (req, res) => {
 });
 
 // ログイン処理
-router.post('/login', authLimiter, (req, res) => {
+router.post('/login', redirectIfAuthenticated, authLimiter, (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
