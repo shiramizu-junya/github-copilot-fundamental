@@ -9,7 +9,16 @@ class TodoController {
 
   // ToDoリストを取得
   getAllTodos(callback) {
-    const sql = 'SELECT * FROM todos ORDER BY deadline ASC, priority DESC';
+    const sql = `
+      SELECT * FROM todos 
+      ORDER BY deadline ASC, 
+        CASE priority 
+          WHEN '高' THEN 1 
+          WHEN '中' THEN 2 
+          WHEN '低' THEN 3 
+          ELSE 4 
+        END ASC
+    `;
     this.db.all(sql, [], (err, rows) => {
       if (err) {
         callback(err, null);

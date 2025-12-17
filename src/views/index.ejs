@@ -33,7 +33,7 @@
                 </div>
                 <div class="todo-actions">
                   <a href="/edit/<%= todo.id %>" class="btn btn-secondary">編集</a>
-                  <form action="/delete/<%= todo.id %>" method="POST" style="display: inline;">
+                  <form action="/delete/<%= todo.id %>" method="POST" class="delete-form">
                     <button type="submit" class="btn btn-danger" onclick="return confirm('本当に削除しますか?')">削除</button>
                   </form>
                 </div>

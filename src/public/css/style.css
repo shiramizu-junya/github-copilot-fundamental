@@ -177,6 +177,10 @@ main {
   gap: 10px;
 }
 
+.delete-form {
+  display: inline;
+}
+
 /* フォーム */
 .todo-form {
   max-width: 600px;
