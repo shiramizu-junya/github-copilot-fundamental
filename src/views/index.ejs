@@ -10,7 +10,13 @@
   <div class="container">
     <header>
       <h1>ToDo管理アプリ</h1>
-      <a href="/new" class="btn btn-primary">新規作成</a>
+      <div class="header-actions">
+        <span class="user-info">ようこそ、<%= user.username %>さん</span>
+        <a href="/new" class="btn btn-primary">新規作成</a>
+        <form action="/logout" method="POST" style="display: inline;">
+          <button type="submit" class="btn btn-secondary">ログアウト</button>
+        </form>
+      </div>
     </header>
 
     <main>
