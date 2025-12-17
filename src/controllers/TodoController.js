@@ -8,9 +8,10 @@ class TodoController {
   }
 
   // ToDoリストを取得
-  getAllTodos(callback) {
+  getAllTodos(userId, callback) {
     const sql = `
       SELECT * FROM todos 
+      WHERE user_id = ?
       ORDER BY deadline ASC, 
         CASE priority 
           WHEN '高' THEN 1 
@@ -19,7 +20,7 @@ class TodoController {
           ELSE 4 
         END ASC
     `;
-    this.db.all(sql, [], (err, rows) => {
+    this.db.all(sql, [userId], (err, rows) => {
       if (err) {
         callback(err, null);
       } else {
@@ -29,9 +30,9 @@ class TodoController {
   }
 
   // 特定のToDoを取得
-  getTodoById(id, callback) {
-    const sql = 'SELECT * FROM todos WHERE id = ?';
-    this.db.get(sql, [id], (err, row) => {
+  getTodoById(id, userId, callback) {
+    const sql = 'SELECT * FROM todos WHERE id = ? AND user_id = ?';
+    this.db.get(sql, [id, userId], (err, row) => {
       if (err) {
         callback(err, null);
       } else {
@@ -41,9 +42,9 @@ class TodoController {
   }
 
   // ToDoを作成
-  createTodo(title, content, deadline, priority, callback) {
-    const sql = 'INSERT INTO todos (title, content, deadline, priority) VALUES (?, ?, ?, ?)';
-    this.db.run(sql, [title, content, deadline, priority], function(err) {
+  createTodo(userId, title, content, deadline, priority, callback) {
+    const sql = 'INSERT INTO todos (user_id, title, content, deadline, priority) VALUES (?, ?, ?, ?, ?)';
+    this.db.run(sql, [userId, title, content, deadline, priority], function(err) {
       if (err) {
         callback(err, null);
       } else {
@@ -53,13 +54,13 @@ class TodoController {
   }
 
   // ToDoを更新
-  updateTodo(id, title, content, deadline, priority, callback) {
+  updateTodo(id, userId, title, content, deadline, priority, callback) {
     const sql = `
       UPDATE todos 
       SET title = ?, content = ?, deadline = ?, priority = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
+      WHERE id = ? AND user_id = ?
     `;
-    this.db.run(sql, [title, content, deadline, priority, id], function(err) {
+    this.db.run(sql, [title, content, deadline, priority, id, userId], function(err) {
       if (err) {
         callback(err, null);
       } else {
@@ -69,9 +70,9 @@ class TodoController {
   }
 
   // ToDoを削除
-  deleteTodo(id, callback) {
-    const sql = 'DELETE FROM todos WHERE id = ?';
-    this.db.run(sql, [id], function(err) {
+  deleteTodo(id, userId, callback) {
+    const sql = 'DELETE FROM todos WHERE id = ? AND user_id = ?';
+    this.db.run(sql, [id, userId], function(err) {
       if (err) {
         callback(err, null);
       } else {

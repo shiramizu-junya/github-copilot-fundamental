@@ -27,12 +27,14 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS todos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
       title TEXT NOT NULL,
       content TEXT,
       deadline TEXT,
       priority TEXT CHECK(priority IN ('低', '中', '高')) DEFAULT '中',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id)
     )
   `, (err) => {
     if (err) {
