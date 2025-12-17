@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDo管理アプリ</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>ToDo管理アプリ</h1>
+      <a href="/new" class="btn btn-primary">新規作成</a>
+    </header>
+
+    <main>
+      <% if (todos.length === 0) { %>
+        <p class="no-todos">ToDoがありません。新しいToDoを作成してください。</p>
+      <% } else { %>
+        <div class="todo-list">
+          <% todos.forEach(todo => { %>
+            <div class="todo-item priority-<%= todo.priority %>">
+              <div class="todo-header">
+                <h2><%= todo.title %></h2>
+                <span class="priority-badge"><%= todo.priority %></span>
+              </div>
+              <div class="todo-content">
+                <p><%= todo.content || '内容なし' %></p>
+              </div>
+              <div class="todo-footer">
+                <div class="todo-info">
+                  <span class="deadline">期限: <%= todo.deadline || '未設定' %></span>
+                </div>
+                <div class="todo-actions">
+                  <a href="/edit/<%= todo.id %>" class="btn btn-secondary">編集</a>
+                  <form action="/delete/<%= todo.id %>" method="POST" class="delete-form">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('本当に削除しますか?')">削除</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+    </main>
+  </div>
+</body>
+</html>
