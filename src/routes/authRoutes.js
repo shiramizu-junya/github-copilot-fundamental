@@ -1,7 +1,17 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const AuthController = require('../controllers/AuthController');
 const { redirectIfAuthenticated } = require('../middleware/authMiddleware');
+
+// レート制限設定
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15分
+  max: 5, // 15分間に5回まで
+  message: 'リクエストが多すぎます。しばらくしてから再度お試しください。',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // ユーザー登録フォームを表示
 router.get('/register', redirectIfAuthenticated, (req, res) => {
@@ -9,7 +19,7 @@ router.get('/register', redirectIfAuthenticated, (req, res) => {
 });
 
 // ユーザー登録処理
-router.post('/register', (req, res) => {
+router.post('/register', authLimiter, (req, res) => {
   const { username, email, password, confirmPassword } = req.body;
 
   // バリデーション
@@ -41,7 +51,7 @@ router.get('/login', redirectIfAuthenticated, (req, res) => {
 });
 
 // ログイン処理
-router.post('/login', (req, res) => {
+router.post('/login', authLimiter, (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
